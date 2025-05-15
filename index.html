@@ -1,390 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Graphing y = mx + b</title>
-<style>
-  /* Reset and base */
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f4f8;
-    color: #222;
-    display: flex;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-  }
-
-  #app {
-    display: flex;
-    max-width: 900px;
-    width: 100%;
-    min-height: 400px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-    overflow: hidden;
-  }
-
-  #controls {
-    background: #1e90ff;
-    color: white;
-    padding: 2rem 1.5rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  #equation {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    user-select: none;
-  }
-
-  .slider-group {
-    margin-bottom: 2.5rem;
-  }
-
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 8px;
-    border-radius: 5px;
-    background: #dddddd;
-    outline: none;
-    transition: background 0.3s;
-  }
-
-  input[type=range]:hover {
-    background: #ccc;
-  }
-
-  /* Slider Thumb */
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #1e90ff;
-    cursor: pointer;
-    transition: background 0.3s, border-color 0.3s;
-    box-shadow: 0 0 6px rgba(30,144,255,0.7);
-  }
-  input[type=range]:active::-webkit-slider-thumb {
-    background: #1e90ff;
-    border-color: white;
-  }
-
-  input[type=range]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #1e90ff;
-    cursor: pointer;
-    transition: background 0.3s, border-color 0.3s;
-    box-shadow: 0 0 6px rgba(30,144,255,0.7);
-  }
-  input[type=range]:active::-moz-range-thumb {
-    background: #1e90ff;
-    border-color: white;
-  }
-
-  #graph-container {
-    flex: 2;
-    background: white;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 100%;
-    display: block;
-  }
-
-  /* Responsive for mobile: stack */
-  @media (max-width: 700px) {
-    #app {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Line Equation Explorer</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(to bottom right, #f0f4ff, #fdf2ff);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
       flex-direction: column;
-      min-height: 600px;
+      align-items: center;
+      color: #333;
     }
-    #controls {
-      flex: none;
-      padding: 1.5rem;
-      order: 2;
+    h1 {
+      margin-bottom: 0.5rem;
     }
-    #graph-container {
-      order: 1;
-      flex: none;
-      height: 300px;
+    .equation {
+      font-family: monospace;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: #fff;
+      border-radius: 0.375rem;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 1rem 0 0.25rem;
+    }
+    input[type="range"] {
       width: 100%;
     }
-  }
-</style>
+  </style>
 </head>
 <body>
+  <h1>Line Equation Explorer</h1>
+  <div id="equation" class="equation">y = 1x + 0</div>
+  <div class="container">
+    <div>
+      <label for="slope">Slope (m): <span id="slopeVal">1</span></label>
+      <input type="range" id="slope" min="-5" max="5" step="0.1" value="1">
 
-<div id="app" role="main">
-  <section id="controls" aria-label="Graph controls">
-    <div id="equation" aria-live="polite" aria-atomic="true">y = 0x + 0</div>
+      <label for="intercept">Y-intercept (b): <span id="interceptVal">0</span></label>
+      <input type="range" id="intercept" min="-10" max="10" step="1" value="0">
 
-    <div class="slider-group">
-      <label for="slope-slider">Slope (m): <span id="m-value">0.0</span></label>
-      <input 
-        type="range" 
-        id="slope-slider" 
-        min="-10" max="10" step="0.1" 
-        value="0" 
-        aria-valuemin="-10" 
-        aria-valuemax="10" 
-        aria-valuenow="0"
-        aria-label="Slope m slider"
-      />
+      <table id="pointsTable">
+        <thead>
+          <tr><th>x</th><th>y</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
+    <canvas id="graph" width="800" height="400"></canvas>
+  </div>
 
-    <div class="slider-group">
-      <label for="intercept-slider">Y Intercept (b): <span id="b-value">0.0</span></label>
-      <input 
-        type="range" 
-        id="intercept-slider" 
-        min="-10" max="10" step="0.1" 
-        value="0" 
-        aria-valuemin="-10" 
-        aria-valuemax="10" 
-        aria-valuenow="0"
-        aria-label="Y intercept b slider"
-      />
-    </div>
-  </section>
-
-  <section id="graph-container" aria-label="Graph output">
-    <canvas id="graph" width="600" height="400" role="img" aria-describedby="graph-desc"></canvas>
-    <div id="graph-desc" class="sr-only">Graph showing the linear equation y equals mx plus b with m and b controlled by sliders.</div>
-  </section>
-</div>
-
-<script>
-  (() => {
+  <script>
+    const slopeSlider = document.getElementById('slope');
+    const interceptSlider = document.getElementById('intercept');
+    const slopeVal = document.getElementById('slopeVal');
+    const interceptVal = document.getElementById('interceptVal');
+    const equationDisplay = document.getElementById('equation');
     const canvas = document.getElementById('graph');
     const ctx = canvas.getContext('2d');
+    const tableBody = document.querySelector('#pointsTable tbody');
 
-    // Set drawing size independent of CSS size for clarity on retina
-    function fixDpi() {
-      let dpi = window.devicePixelRatio || 1;
-      let style_height = +getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
-      let style_width = +getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
-      canvas.width = style_width * dpi;
-      canvas.height = style_height * dpi;
-      ctx.scale(dpi, dpi);
-    }
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
+    const SCALE = 20;
+    const ORIGIN_X = WIDTH / 2;
+    const ORIGIN_Y = HEIGHT / 2;
 
-    fixDpi();
-
-    // Graph params
-    const graphRange = 10;
-    const padding = 40;     // padding inside canvas for axes and labels
-
-    // Elements
-    const slopeSlider = document.getElementById('slope-slider');
-    const interceptSlider = document.getElementById('intercept-slider');
-    const mValueSpan = document.getElementById('m-value');
-    const bValueSpan = document.getElementById('b-value');
-    const equationDiv = document.getElementById('equation');
-
-    // Convert graph x coords to canvas pixels
-    function xToPixel(x) {
-      const w = canvas.clientWidth;
-      return padding + ((x + graphRange) / (2 * graphRange)) * (w - 2 * padding);
-    }
-
-    // Convert graph y coords to canvas pixels (inverted y-axis)
-    function yToPixel(y) {
-      const h = canvas.clientHeight;
-      return h - padding - ((y + graphRange) / (2 * graphRange)) * (h - 2 * padding);
-    }
-
-    // Draw grid lines
-    function drawGrid() {
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-
-      ctx.clearRect(0, 0, w, h);
-
-      ctx.strokeStyle = "#e0e6f0";
+    function drawAxes() {
+      ctx.strokeStyle = '#aaa';
       ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, ORIGIN_Y);
+      ctx.lineTo(WIDTH, ORIGIN_Y);
+      ctx.moveTo(ORIGIN_X, 0);
+      ctx.lineTo(ORIGIN_X, HEIGHT);
+      ctx.stroke();
 
-      ctx.font = "12px 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+      ctx.font = "10px sans-serif";
       ctx.fillStyle = "#666";
       ctx.textAlign = "center";
-      ctx.textBaseline = "top";
 
-      // vertical grid lines and labels
-      for(let x = -graphRange; x <= graphRange; x++) {
-        let px = xToPixel(x);
-
+      // Grid + X labels
+      ctx.strokeStyle = '#eee';
+      for (let x = -20; x <= 20; x++) {
+        const px = ORIGIN_X + x * SCALE;
         ctx.beginPath();
-        ctx.moveTo(px, padding);
-        ctx.lineTo(px, h - padding);
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px, HEIGHT);
         ctx.stroke();
-
-        if (x !== 0) {
-          ctx.fillText(x, px, h - padding + 6);
-        }
+        if (x % 2 === 0) ctx.fillText(x, px, ORIGIN_Y + 12);
       }
 
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-
-      // horizontal grid lines and labels
-      for(let y = -graphRange; y <= graphRange; y++) {
-        let py = yToPixel(y);
-
+      // Grid + Y labels
+      for (let y = -10; y <= 10; y++) {
+        const py = ORIGIN_Y - y * SCALE;
         ctx.beginPath();
-        ctx.moveTo(padding, py);
-        ctx.lineTo(w - padding, py);
+        ctx.moveTo(0, py);
+        ctx.lineTo(WIDTH, py);
         ctx.stroke();
-
-        if (y !== 0) {
-          ctx.fillText(y, padding - 8, py);
-        }
+        if (y !== 0 && y % 1 === 0) ctx.fillText(y, ORIGIN_X - 12, py + 3);
       }
-
-      // Draw axes thicker and different color
-      ctx.strokeStyle = "#1e90ff";
-      ctx.lineWidth = 2;
-
-      // y-axis
-      ctx.beginPath();
-      ctx.moveTo(xToPixel(0), padding);
-      ctx.lineTo(xToPixel(0), h - padding);
-      ctx.stroke();
-
-      // x-axis
-      ctx.beginPath();
-      ctx.moveTo(padding, yToPixel(0));
-      ctx.lineTo(w - padding, yToPixel(0));
-      ctx.stroke();
     }
 
-    // Draw line y = mx + b on the graph
     function drawLine(m, b) {
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      drawAxes();
 
-      ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 3;
-      ctx.lineCap = "round";
-
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-
-      // We compute y for the leftmost and rightmost x in graph range
-      let x1 = -graphRange;
-      let y1 = m * x1 + b;
-
-      let x2 = graphRange;
-      let y2 = m * x2 + b;
-
-      // Clip y values to graph range
-      if (y1 < -graphRange) {
-        y1 = -graphRange;
-        x1 = (y1 - b) / m;
-      } else if (y1 > graphRange) {
-        y1 = graphRange;
-        x1 = (y1 - b) / m;
+      let started = false;
+      for (let x = -20; x <= 20; x++) {
+        const px = ORIGIN_X + x * SCALE;
+        const y = m * x + b;
+        const py = ORIGIN_Y - y * SCALE;
+        if (!started) {
+          ctx.moveTo(px, py);
+          started = true;
+        } else {
+          ctx.lineTo(px, py);
+        }
       }
-
-      if (y2 < -graphRange) {
-        y2 = -graphRange;
-        x2 = (y2 - b) / m;
-      } else if (y2 > graphRange) {
-        y2 = graphRange;
-        x2 = (y2 - b) / m;
-      }
-
-      ctx.moveTo(xToPixel(x1), yToPixel(y1));
-      ctx.lineTo(xToPixel(x2), yToPixel(y2));
       ctx.stroke();
     }
 
-    // Format equation string nicely
-    function formatEquation(m, b) {
-      let mStr = "";
-      if (Math.abs(m) < 0.0001) {
-        mStr = "0";
-      } else if (Math.abs(m - 1) < 0.0001) {
-        mStr = "x";
-      } else if (Math.abs(m + 1) < 0.0001) {
-        mStr = "-x";
-      } else {
-        mStr = m.toFixed(1) + "x";
+    function updateTable(m, b) {
+      tableBody.innerHTML = '';
+      for (let x = -10; x <= 10; x++) {
+        const y = m * x + b;
+        const row = `<tr><td>${x}</td><td>${y.toFixed(2)}</td></tr>`;
+        tableBody.innerHTML += row;
       }
-
-      let bStr = "";
-      if (Math.abs(b) < 0.0001) {
-        bStr = "";
-      } else if (b > 0) {
-        bStr = " + " + b.toFixed(1);
-      } else {
-        bStr = " - " + Math.abs(b).toFixed(1);
-      }
-
-      if (mStr === "0" && bStr === "") {
-        return "y = 0";
-      } else if (mStr === "0") {
-        return `y = ${b.toFixed(1)}`;
-      }
-
-      return `y = ${mStr}${bStr}`;
     }
 
-    // Update all outputs
     function update() {
-      let m = parseFloat(slopeSlider.value);
-      let b = parseFloat(interceptSlider.value);
+      const m = parseFloat(slopeSlider.value);
+      const b = parseFloat(interceptSlider.value);
 
-      mValueSpan.textContent = m.toFixed(1);
-      bValueSpan.textContent = b.toFixed(1);
+      slopeVal.textContent = m;
+      interceptVal.textContent = b;
+      equationDisplay.textContent = `y = ${m}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)}`;
 
-      equationDiv.textContent = formatEquation(m, b);
-
-      drawGrid();
       drawLine(m, b);
+      updateTable(m, b);
     }
 
-    // Initialize
+    slopeSlider.addEventListener('input', update);
+    interceptSlider.addEventListener('input', update);
+
     update();
-
-    slopeSlider.addEventListener("input", update);
-    interceptSlider.addEventListener("input", update);
-
-    // Handle window resize for dpi fix and redraw
-    window.addEventListener('resize', () => {
-      fixDpi();
-      update();
-    });
-  })();
-</script>
-
+  </script>
 </body>
 </html>
